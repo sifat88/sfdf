@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-1.0-success)](https://github.com/sifat/sfdf/releases)
 
-**🔗 Live tool:** [sifat.github.io/sfdf](https://sifat.github.io/sfdf)
+**🔗 Live tool:** [https://sifat88.github.io/sfdf/](https://sifat88.github.io/sfdf/)
 
 ---
 
