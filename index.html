@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SFDF · The Strategic Financing Decision Framework</title>
+<meta name="description" content="A directional decision-support tool for early-stage tech founders choosing between bootstrapping and equity financing.">
+<meta name="author" content="Sifat · MIETE Dissertation · U.Porto">
+
+<!-- Open Graph for social sharing -->
+<meta property="og:title" content="SFDF — The Strategic Financing Decision Framework">
+<meta property="og:description" content="An open-source decision tool for early-stage tech founders. Score 15 factors, get a directional reading on bootstrap vs. equity.">
+<meta property="og:type" content="website">
+
+<!-- Typography: refined editorial pairing -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400;1,9..144,600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  /* Type */
+  --serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --sans: 'IBM Plex Sans', -apple-system, system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+
+  /* Color — refined editorial */
+  --paper: #FBFAF6;        /* warm off-white */
+  --paper-2: #F4F2EC;      /* soft cream for cards */
+  --ink: #0F172A;          /* deep slate */
+  --ink-2: #334155;        /* secondary */
+  --muted: #64748B;        /* tertiary */
+  --hairline: #E5E2DA;     /* subtle dividers */
+  --hairline-2: #D4CFC1;   /* slightly stronger */
+
+  --b-deep: #0F766E;       /* bootstrap teal */
+  --b-mid: #5EEAD4;
+  --b-pale: #ECFDF5;
+
+  --e-deep: #7C3AED;       /* equity violet */
+  --e-mid: #C4B5FD;
+  --e-pale: #FAF5FF;
+
+  --neutral-deep: #B45309;  /* tension amber */
+  --neutral-mid: #FCD34D;
+  --neutral-pale: #FFFBEB;
+
+  --accent: #DC2626;        /* sparingly */
+
+  /* Spacing scale */
+  --s1: 4px;  --s2: 8px;  --s3: 12px;  --s4: 16px;
+  --s5: 24px; --s6: 32px; --s7: 48px;  --s8: 64px;
+  --s9: 96px; --s10: 128px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.06);
+  --shadow-md: 0 4px 6px rgba(15,23,42,0.04), 0 10px 15px rgba(15,23,42,0.06);
+  --shadow-lg: 0 10px 15px rgba(15,23,42,0.04), 0 20px 40px rgba(15,23,42,0.08);
+}
+
+/* ============================================================
+   RESET & BASELINE
+   ============================================================ */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.55;
+  font-weight: 400;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+}
+
+/* ============================================================
+   PAPER TEXTURE (subtle warmth — not skeuomorphic)
+   ============================================================ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image:
+    radial-gradient(at 20% 30%, rgba(180, 130, 70, 0.015) 0px, transparent 50%),
+    radial-gradient(at 80% 70%, rgba(124, 58, 237, 0.015) 0px, transparent 50%);
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--s5);
+  position: relative;
+  z-index: 2;
+}
+
+.container-narrow {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 var(--s5);
+}
+
+/* ============================================================
+   TOP BAR
+   ============================================================ */
+.topbar {
+  border-bottom: 1px solid var(--hairline);
+  padding: var(--s4) 0;
+  position: sticky;
+  top: 0;
+  background: rgba(251, 250, 246, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 100;
+}
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s5);
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.brand-mark {
+  font-family: var(--serif);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  font-variation-settings: 'opsz' 144;
+}
+
+.brand-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.topbar-nav {
+  display: flex;
+  gap: var(--s5);
+  align-items: center;
+}
+
+.topbar-nav a {
+  font-size: 13px;
+  color: var(--ink-2);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: color 0.15s ease;
+}
+
+.topbar-nav a:hover {
+  color: var(--ink);
+}
+
+.topbar-nav a.cta {
+  background: var(--ink);
+  color: var(--paper);
+  padding: var(--s2) var(--s4);
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.topbar-nav a.cta:hover {
+  background: var(--ink-2);
+  color: var(--paper);
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  padding: var(--s10) 0 var(--s9);
+  position: relative;
+}
+
+.hero-kicker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: var(--s5);
+  font-weight: 500;
+}
+
+.hero h1 {
+  font-family: var(--serif);
+  font-weight: 800;
+  font-size: clamp(48px, 7.5vw, 88px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  font-variation-settings: 'opsz' 144;
+  margin-bottom: var(--s5);
+  max-width: 14ch;
+}
+
+.hero h1 em {
+  font-style: italic;
+  font-weight: 400;
+  font-variation-settings: 'opsz' 144;
+}
+
+.hero-lede {
+  font-family: var(--serif);
+  font-size: clamp(20px, 2.2vw, 26px);
+  line-height: 1.4;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink-2);
+  max-width: 38ch;
+  margin-bottom: var(--s7);
+  font-variation-settings: 'opsz' 36;
+}
+
+.hero-actions {
+  display: flex;
+  gap: var(--s4);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s4) var(--s6);
+  border: none;
+  border-radius: 4px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.btn-primary:hover {
+  background: var(--ink-2);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--hairline-2);
+}
+
+.btn-secondary:hover {
+  border-color: var(--ink);
+}
+
+.btn-arrow {
+  font-family: var(--serif);
+  font-style: italic;
+  transition: transform 0.2s ease;
+}
+
+.btn:hover .btn-arrow {
+  transform: translateX(3px);
+}
+
+/* Decorative editorial number */
+.hero-number {
+  position: absolute;
+  top: var(--s8);
+  right: var(--s5);
+  font-family: var(--serif);
+  font-size: 200px;
+  line-height: 1;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--hairline);
+  z-index: -1;
+  font-variation-settings: 'opsz' 144;
+  user-select: none;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .hero-number { display: none; }
+}
+
+/* ============================================================
+   SECTION HEADERS
+   ============================================================ */
+.section {
+  padding: var(--s9) 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.section-meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s5);
+  margin-bottom: var(--s7);
+}
+
+.section-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--ink);
+  font-variation-settings: 'opsz' 96;
+  max-width: 22ch;
+}
+
+.section-title em {
+  font-style: italic;
+  font-weight: 400;
+}
+
+.section-subtitle {
+  font-size: 17px;
+  color: var(--ink-2);
+  max-width: 55ch;
+  margin-top: var(--s4);
+  line-height: 1.55;
+}
+
+/* ============================================================
+   THE QUESTION (intro section)
+   ============================================================ */
+.intro-quote {
+  font-family: var(--serif);
+  font-size: clamp(28px, 3.6vw, 44px);
+  line-height: 1.2;
+  font-style: italic;
+  color: var(--ink);
+  font-weight: 400;
+  font-variation-settings: 'opsz' 144;
+  letter-spacing: -0.02em;
+  max-width: 24ch;
+  margin: 0 auto;
+  text-align: center;
+  padding: var(--s8) 0;
+  position: relative;
+}
+
+.intro-quote::before,
+.intro-quote::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 1px;
+  background: var(--ink);
+  margin: var(--s7) auto;
+}
+
+/* ============================================================
+   THE CANVAS — interactive scoring
+   ============================================================ */
+.canvas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s5);
+  margin-top: var(--s6);
+}
+
+@media (min-width: 1024px) {
+  .canvas-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.dimension {
+  background: white;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  padding: var(--s5);
+  position: relative;
+  transition: box-shadow 0.2s ease;
+}
+
+.dimension:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.dimension::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  border-radius: 6px 6px 0 0;
+}
+
+.dimension[data-tone="bootstrap"]::before { background: var(--b-deep); }
+.dimension[data-tone="venture"]::before { background: var(--neutral-deep); }
+.dimension[data-tone="market"]::before { background: var(--e-deep); }
+.dimension[data-tone="strategic"]::before { background: var(--e-deep); }
+
+.dim-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: var(--s3);
+}
+
+.dim-title {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--s2);
+  color: var(--ink);
+  font-variation-settings: 'opsz' 96;
+}
+
+.dim-blurb {
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: var(--s5);
+  line-height: 1.5;
+}
+
+.dim-divider {
+  height: 1px;
+  background: var(--hairline);
+  margin: var(--s5) 0;
+}
+
+/* Factor rows */
+.factor {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--s4);
+  align-items: start;
+  padding: var(--s4) 0;
+  border-bottom: 1px dashed var(--hairline);
+}
+
+.factor:last-of-type {
+  border-bottom: none;
+}
+
+.factor-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.factor-id {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.factor-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.factor-direction {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+  font-style: italic;
+}
+
+.factor-direction.bootstrap { color: var(--b-deep); }
+.factor-direction.equity { color: var(--e-deep); }
+
+/* Score selector — segmented buttons */
+.score-buttons {
+  display: flex;
+  gap: 2px;
+  background: var(--paper-2);
+  padding: 3px;
+  border-radius: 6px;
+}
+
+.score-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-btn:hover {
+  background: white;
+  color: var(--ink);
+}
+
+.score-btn.active {
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 600;
+}
+
+.dim-footer {
+  margin-top: var(--s5);
+  padding-top: var(--s4);
+  border-top: 1px solid var(--hairline);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   THE READING — live result panel
+   ============================================================ */
+.reading {
+  margin-top: var(--s8);
+  background: white;
+  border: 1px solid var(--ink);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  position: sticky;
+  bottom: var(--s4);
+  z-index: 50;
+}
+
+.reading-header {
+  background: var(--ink);
+  color: var(--paper);
+  padding: var(--s4) var(--s6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reading-header h3 {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.reading-progress {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--paper);
+  opacity: 0.75;
+  letter-spacing: 0.1em;
+}
+
+.reading-body {
+  padding: var(--s6) var(--s7);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s6);
+}
+
+@media (min-width: 768px) {
+  .reading-body {
+    grid-template-columns: 1fr 2fr;
+    align-items: start;
+  }
+}
+
+.reading-score {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.reading-score-num {
+  font-family: var(--serif);
+  font-size: 80px;
+  line-height: 0.95;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.04em;
+  font-variation-settings: 'opsz' 144;
+  font-feature-settings: 'tnum' 1;
+}
+
+.reading-score-num[data-zone="strong-bootstrap"],
+.reading-score-num[data-zone="bootstrap-leaning"] {
+  color: var(--b-deep);
+}
+
+.reading-score-num[data-zone="strong-equity"],
+.reading-score-num[data-zone="equity-leaning"] {
+  color: var(--e-deep);
+}
+
+.reading-score-num[data-zone="ambiguous"] {
+  color: var(--neutral-deep);
+}
+
+.reading-score-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.reading-zone {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+
+.reading-zone-name {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variation-settings: 'opsz' 96;
+}
+
+.reading-zone-tagline {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-style: italic;
+  color: var(--ink-2);
+  font-variation-settings: 'opsz' 36;
+}
+
+.reading-zone-spectrum {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: var(--s4);
+  position: relative;
+}
+
+.reading-zone-spectrum > div {
+  flex: 1;
+  transition: opacity 0.3s ease;
+  opacity: 0.25;
+}
+
+.reading-zone-spectrum > div.active {
+  opacity: 1;
+}
+
+.reading-zone-spectrum > .seg-1 { background: var(--b-mid); }
+.reading-zone-spectrum > .seg-2 { background: var(--b-pale); border: 1px solid var(--b-mid); }
+.reading-zone-spectrum > .seg-3 { background: var(--neutral-pale); border: 1px solid var(--neutral-mid); }
+.reading-zone-spectrum > .seg-4 { background: var(--e-pale); border: 1px solid var(--e-mid); }
+.reading-zone-spectrum > .seg-5 { background: var(--e-mid); }
+
+.reading-zone-spectrum-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--s2);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* Reading expanded section (drivers, watchouts, actions) */
+.reading-detail {
+  border-top: 1px solid var(--hairline);
+  padding: var(--s6) var(--s7);
+  display: none;
+  grid-template-columns: 1fr;
+  gap: var(--s6);
+}
+
+.reading-detail.visible {
+  display: grid;
+}
+
+@media (min-width: 768px) {
+  .reading-detail.visible {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.detail-block h4 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: var(--s3);
+}
+
+.detail-list {
+  list-style: none;
+}
+
+.detail-list li {
+  padding: var(--s3) 0;
+  border-bottom: 1px dashed var(--hairline);
+  font-size: 14px;
+  line-height: 1.5;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--s3);
+  align-items: center;
+}
+
+.detail-list li:last-child {
+  border-bottom: none;
+}
+
+.detail-list .factor-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--paper-2);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.detail-list .factor-name-mini {
+  color: var(--ink-2);
+}
+
+.detail-list .factor-contrib {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  font-feature-settings: 'tnum' 1;
+}
+
+.detail-list .factor-contrib.positive { color: var(--e-deep); }
+.detail-list .factor-contrib.negative { color: var(--b-deep); }
+
+.actions-block {
+  background: var(--paper-2);
+  padding: var(--s5);
+  border-radius: 6px;
+  border-left: 3px solid var(--ink);
+  grid-column: 1 / -1;
+}
+
+.actions-block h4 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: var(--s3);
+}
+
+.actions-block .actions-headline {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--s4);
+  color: var(--ink);
+}
+
+.actions-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+
+.actions-list li {
+  padding-left: var(--s5);
+  position: relative;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.actions-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  font-family: var(--serif);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.actions-citation {
+  margin-top: var(--s4);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* CTA actions inside reading */
+.reading-actions {
+  display: flex;
+  gap: var(--s3);
+  flex-wrap: wrap;
+  padding: var(--s5) var(--s7);
+  border-top: 1px solid var(--hairline);
+  background: var(--paper-2);
+}
+
+.reading-actions .btn {
+  font-size: 13px;
+  padding: var(--s3) var(--s5);
+}
+
+/* Empty state when no scores yet */
+.reading-empty {
+  padding: var(--s7);
+  text-align: center;
+  color: var(--muted);
+  font-style: italic;
+  font-family: var(--serif);
+  font-size: 18px;
+  font-variation-settings: 'opsz' 36;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.foundations {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s5);
+  margin-top: var(--s6);
+}
+
+@media (min-width: 768px) {
+  .foundations {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.foundation {
+  padding: var(--s5);
+  border-left: 2px solid var(--ink);
+  background: white;
+  border-top: 1px solid var(--hairline);
+  border-right: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0 4px 4px 0;
+}
+
+.foundation-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: var(--s2);
+}
+
+.foundation-cite {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: var(--s2);
+  color: var(--ink);
+}
+
+.foundation-blurb {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+
+.endmark {
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--ink-2);
+  margin: var(--s8) auto;
+  max-width: 40ch;
+  line-height: 1.4;
+  font-variation-settings: 'opsz' 36;
+}
+
+.endmark::before {
+  content: '◆';
+  display: block;
+  font-style: normal;
+  font-size: 12px;
+  margin-bottom: var(--s4);
+  color: var(--ink);
+}
+
+footer.colophon {
+  background: var(--ink);
+  color: var(--paper);
+  padding: var(--s8) 0;
+  margin-top: var(--s8);
+}
+
+.colophon-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s6);
+}
+
+@media (min-width: 768px) {
+  .colophon-grid {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+  }
+}
+
+.colophon h5 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(251, 250, 246, 0.5);
+  margin-bottom: var(--s3);
+  font-weight: 500;
+}
+
+.colophon .brand-block .brand-mark {
+  color: var(--paper);
+  font-size: 28px;
+  margin-bottom: var(--s2);
+  display: block;
+}
+
+.colophon p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(251, 250, 246, 0.75);
+  max-width: 36ch;
+}
+
+.colophon ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.colophon a {
+  color: rgba(251, 250, 246, 0.85);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.15s;
+}
+
+.colophon a:hover {
+  color: var(--paper);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.colophon-foot {
+  border-top: 1px solid rgba(251, 250, 246, 0.15);
+  margin-top: var(--s7);
+  padding-top: var(--s5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: rgba(251, 250, 246, 0.5);
+  text-transform: uppercase;
+  flex-wrap: wrap;
+  gap: var(--s3);
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fadeUp 0.6s cubic-bezier(0.2, 0.65, 0.4, 1) backwards;
+}
+
+.fade-up-1 { animation-delay: 0.1s; }
+.fade-up-2 { animation-delay: 0.2s; }
+.fade-up-3 { animation-delay: 0.3s; }
+.fade-up-4 { animation-delay: 0.4s; }
+
+@keyframes scoreUpdate {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+.score-pulse {
+  animation: scoreUpdate 0.4s ease;
+}
+
+/* ============================================================
+   RESPONSIVE — comprehensive mobile + tablet overrides
+   Breakpoints:
+     ≥ 1024px  desktop (default)
+     640–1023  tablet
+     ≤  639   phone
+   ============================================================ */
+
+/* Prevent horizontal scrolling at any size */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Mobile menu toggle — hidden on desktop */
+.menu-toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--hairline-2);
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--ink);
+}
+
+.menu-toggle:hover { border-color: var(--ink); }
+.menu-toggle svg { width: 18px; height: 18px; }
+
+/* ----- Tablet & below (≤ 1023px) ----- */
+@media (max-width: 1023px) {
+  .container { padding: 0 var(--s4); }
+  .container-narrow { padding: 0 var(--s4); }
+
+  /* Section meta: stack vertically */
+  .section-meta {
+    flex-direction: column;
+    gap: var(--s3);
+  }
+  .section-num { min-width: 0; }
+
+  /* Canvas: 2 columns at tablet */
+  .canvas-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s4);
+  }
+
+  /* Hero number smaller on tablet */
+  .hero-number { font-size: 140px; right: var(--s4); top: var(--s7); }
+
+  /* Tighter vertical rhythm */
+  .hero { padding: var(--s8) 0 var(--s7); }
+  .section { padding: var(--s7) 0; }
+}
+
+/* ----- Phone (≤ 639px) ----- */
+@media (max-width: 639px) {
+  .container, .container-narrow { padding: 0 var(--s4); }
+
+  /* Topbar: collapse nav into hamburger */
+  .brand-tag { display: none; }
+  .topbar-nav { gap: var(--s3); }
+  .topbar-nav a:not(.cta) { display: none; }
+  .menu-toggle { display: inline-flex; }
+
+  /* Mobile menu overlay when open */
+  .topbar-nav.open {
+    display: flex !important;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: var(--paper);
+    padding: var(--s4);
+    border-bottom: 1px solid var(--hairline);
+    border-top: 1px solid var(--hairline);
+    gap: var(--s4);
+    align-items: stretch;
+    box-shadow: var(--shadow-md);
+  }
+  .topbar-nav.open a:not(.cta) {
+    display: block;
+    padding: var(--s3) 0;
+    border-bottom: 1px solid var(--hairline);
+    font-size: 16px;
+  }
+  .topbar-nav.open a:last-child { border-bottom: none; }
+  .topbar { position: relative; }
+
+  /* Hero */
+  .hero { padding: var(--s7) 0 var(--s6); }
+  .hero-number { display: none; }
+  .hero h1 { font-size: 44px; line-height: 1.0; }
+  .hero-lede { font-size: 18px; }
+  .hero-actions { gap: var(--s3); }
+  .hero-actions .btn { width: 100%; justify-content: center; }
+
+  /* Section titles */
+  .section-title { font-size: 30px; }
+  .intro-quote { font-size: 26px; padding: var(--s5) 0; }
+  .intro-quote::before, .intro-quote::after { margin: var(--s5) auto; }
+
+  /* Canvas: SINGLE column on phone */
+  .canvas-grid { grid-template-columns: 1fr; gap: var(--s4); }
+
+  /* Dimension cards: tighter padding */
+  .dimension { padding: var(--s4); }
+  .dim-title { font-size: 22px; }
+
+  /* Factor rows: stack score buttons under the name */
+  .factor {
+    grid-template-columns: 1fr;
+    gap: var(--s3);
+  }
+
+  /* Score buttons: full-width row, larger touch targets */
+  .score-buttons {
+    width: 100%;
+    justify-content: space-between;
+    padding: 4px;
+  }
+  .score-btn {
+    flex: 1;
+    height: 44px;
+    font-size: 15px;
+  }
+
+  /* Reading panel: not sticky on phone (saves screen space) */
+  .reading {
+    position: static;
+    margin-top: var(--s6);
+  }
+  .reading-header { padding: var(--s3) var(--s4); }
+  .reading-header h3 { font-size: 10px; }
+  .reading-progress { font-size: 10px; }
+
+  .reading-body {
+    padding: var(--s5) var(--s4);
+    grid-template-columns: 1fr;
+    gap: var(--s4);
+  }
+  .reading-score-num { font-size: 56px; }
+  .reading-zone-name { font-size: 26px; }
+  .reading-zone-tagline { font-size: 16px; line-height: 1.4; }
+  .reading-zone-spectrum-labels { font-size: 8px; }
+
+  .reading-detail.visible {
+    grid-template-columns: 1fr;
+    padding: var(--s5) var(--s4);
+    gap: var(--s5);
+  }
+
+  .actions-block { padding: var(--s4); }
+  .actions-headline { font-size: 20px; }
+
+  .reading-actions {
+    padding: var(--s4);
+    flex-direction: column;
+  }
+  .reading-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Detail list: tighter on phone */
+  .detail-list li {
+    grid-template-columns: auto 1fr auto;
+    font-size: 13px;
+    padding: var(--s2) 0;
+  }
+  .detail-list .factor-name-mini { font-size: 13px; }
+
+  /* How it works steps */
+  .section[id="how"] > .container-narrow > div[style*="grid"] > div {
+    grid-template-columns: 60px 1fr !important;
+    gap: var(--s3) !important;
+  }
+  .section[id="how"] > .container-narrow > div[style*="grid"] div[style*="font-size: 48px"] {
+    font-size: 36px !important;
+  }
+
+  /* Foundations: 1 column */
+  .foundations { grid-template-columns: 1fr; gap: var(--s3); }
+
+  /* Colophon */
+  .colophon-grid { grid-template-columns: 1fr; gap: var(--s5); }
+  .colophon-foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s3);
+    text-align: left;
+    font-size: 9px;
+  }
+
+  .endmark { font-size: 18px; margin: var(--s7) auto; }
+  .section { padding: var(--s6) 0; }
+}
+
+/* ----- Touch devices (any size): minimum tap target sizes ----- */
+@media (hover: none) and (pointer: coarse) {
+  .score-btn { min-height: 36px; min-width: 36px; }
+  .btn { min-height: 44px; }
+  .menu-toggle { min-height: 44px; min-width: 44px; }
+}
+
+/* ----- iOS safe-area insets ----- */
+@supports (padding: max(0px)) {
+  .topbar {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}
+
+/* ============================================================
+   PRINT STYLES (for "Save as PDF" output)
+   ============================================================ */
+@media print {
+  body { background: white; }
+  .topbar, .hero-actions, .reading-actions, footer.colophon, .hero-number, .menu-toggle { display: none; }
+  .reading { position: static; box-shadow: none; }
+  .section { page-break-inside: avoid; }
+  body::before { display: none; }
+}
+
+/* Reset progress for accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ===========================
+     TOP BAR
+     =========================== -->
+<header class="topbar">
+  <div class="container topbar-inner">
+    <a href="#" class="brand">
+      <span class="brand-mark">SFDF</span>
+      <span class="brand-tag">Strategic Financing Decision Framework</span>
+    </a>
+    <nav class="topbar-nav" id="topbar-nav">
+      <a href="#canvas">The Canvas</a>
+      <a href="#how">How it works</a>
+      <a href="#foundations">Foundations</a>
+      <a href="https://github.com/sifat/sfdf" class="cta" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="topbar-nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- ===========================
+     HERO
+     =========================== -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-number">01</div>
+    <div class="hero-kicker fade-up fade-up-1">An open-source decision tool · v1.0</div>
+    <h1 class="fade-up fade-up-2">
+      Bootstrap, equity, or <em>somewhere</em> between?
+    </h1>
+    <p class="hero-lede fade-up fade-up-3">
+      A directional decision-support framework for early-stage tech founders, built on a systematic literature review of bootstrapping and equity financing.
+    </p>
+    <div class="hero-actions fade-up fade-up-4">
+      <a href="#canvas" class="btn btn-primary">
+        Run the Framework
+        <span class="btn-arrow">→</span>
+      </a>
+      <a href="#how" class="btn btn-secondary">How it works</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================
+     INTRO / THE QUESTION
+     =========================== -->
+<section class="section">
+  <div class="container-narrow">
+    <div class="section-meta">
+      <span class="section-num">§ 01</span>
+      <div>
+        <h2 class="section-title">The question every founder faces.</h2>
+      </div>
+    </div>
+    <p class="intro-quote">
+      When should a founder bootstrap, and when should they raise?
+    </p>
+    <p style="font-size: 16px; line-height: 1.7; color: var(--ink-2); max-width: 60ch;">
+      Founders rarely answer this with a structured method. Most pattern-match to recent stories, copy peers, or default to the first available capital. The Framework replaces that habit with a directional reading on fifteen factors that, together, account for most of the decision.
+    </p>
+  </div>
+</section>
+
+<!-- ===========================
+     THE CANVAS — INTERACTIVE
+     =========================== -->
+<section class="section" id="canvas">
+  <div class="container">
+    <div class="section-meta">
+      <span class="section-num">§ 02</span>
+      <div>
+        <h2 class="section-title">The <em>Canvas</em>.</h2>
+        <p class="section-subtitle">
+          Score each factor 1 to 5 based on your situation. The reading updates as you go. Three is neutral; ones and fives carry the most weight.
+        </p>
+      </div>
+    </div>
+
+    <div class="canvas-grid" id="canvas-grid">
+      <!-- Dimensions injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ===========================
+     THE READING — LIVE PANEL
+     =========================== -->
+<section class="section" id="reading-section" style="border-top: none; padding-top: 0;">
+  <div class="container">
+    <div class="reading">
+      <div class="reading-header">
+        <h3>Your Reading</h3>
+        <span class="reading-progress" id="progress">0 / 15 factors scored</span>
+      </div>
+
+      <div class="reading-body">
+        <div class="reading-score">
+          <div class="reading-score-num" id="score-num" data-zone="ambiguous">—</div>
+          <div class="reading-score-label">Net Score · range −2.0 to +2.0</div>
+        </div>
+        <div class="reading-zone">
+          <div class="reading-zone-name" id="zone-name">Awaiting your scores</div>
+          <div class="reading-zone-tagline" id="zone-tagline">Score every factor for a directional reading.</div>
+          <div class="reading-zone-spectrum" id="spectrum">
+            <div class="seg-1"></div>
+            <div class="seg-2"></div>
+            <div class="seg-3"></div>
+            <div class="seg-4"></div>
+            <div class="seg-5"></div>
+          </div>
+          <div class="reading-zone-spectrum-labels">
+            <span>Strong Bootstrap</span>
+            <span>Bootstrap-leaning</span>
+            <span>Tension</span>
+            <span>Equity-leaning</span>
+            <span>Strong Equity</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="reading-detail" id="reading-detail">
+        <div class="detail-block">
+          <h4>Top Drivers</h4>
+          <ul class="detail-list" id="drivers-list"></ul>
+        </div>
+        <div class="detail-block">
+          <h4>Top Watch-outs</h4>
+          <ul class="detail-list" id="watchouts-list"></ul>
+        </div>
+        <div class="actions-block" id="actions-block">
+          <h4>Suggested next actions</h4>
+          <div class="actions-headline" id="actions-headline">—</div>
+          <ul class="actions-list" id="actions-list"></ul>
+          <div class="actions-citation" id="actions-cite"></div>
+        </div>
+      </div>
+
+      <div class="reading-actions">
+        <button class="btn btn-secondary" id="btn-print">Save as PDF</button>
+        <button class="btn btn-secondary" id="btn-reset">Reset scores</button>
+        <button class="btn btn-secondary" id="btn-share">Copy share link</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================
+     HOW IT WORKS
+     =========================== -->
+<section class="section" id="how">
+  <div class="container-narrow">
+    <div class="section-meta">
+      <span class="section-num">§ 03</span>
+      <div>
+        <h2 class="section-title">How the <em>scoring</em> works.</h2>
+        <p class="section-subtitle">Four steps. No black box. The math is shown so you can defend, contest, or ignore the reading on its merits.</p>
+      </div>
+    </div>
+
+    <div style="display: grid; gap: var(--s5); margin-top: var(--s5);">
+
+      <div style="display: grid; grid-template-columns: 80px 1fr; gap: var(--s5); padding-bottom: var(--s5); border-bottom: 1px solid var(--hairline);">
+        <div style="font-family: var(--serif); font-size: 48px; font-style: italic; color: var(--b-deep); font-weight: 400; line-height: 1; font-variation-settings: 'opsz' 144;">i.</div>
+        <div>
+          <h4 style="font-family: var(--serif); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--s2);">Score</h4>
+          <p style="color: var(--ink-2); line-height: 1.65; font-size: 15px;">Each factor receives a 1–5 score from the founder, based on self-assessment against the anchor descriptions.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 80px 1fr; gap: var(--s5); padding-bottom: var(--s5); border-bottom: 1px solid var(--hairline);">
+        <div style="font-family: var(--serif); font-size: 48px; font-style: italic; color: var(--neutral-deep); font-weight: 400; line-height: 1; font-variation-settings: 'opsz' 144;">ii.</div>
+        <div>
+          <h4 style="font-family: var(--serif); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--s2);">Centre &amp; sign</h4>
+          <p style="color: var(--ink-2); line-height: 1.65; font-size: 15px;">Each score is centred (raw minus 3) and signed by direction. Equity-favourable factors contribute positively; bootstrap-favourable factors contribute negatively.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 80px 1fr; gap: var(--s5); padding-bottom: var(--s5); border-bottom: 1px solid var(--hairline);">
+        <div style="font-family: var(--serif); font-size: 48px; font-style: italic; color: var(--neutral-deep); font-weight: 400; line-height: 1; font-variation-settings: 'opsz' 144;">iii.</div>
+        <div>
+          <h4 style="font-family: var(--serif); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--s2);">Aggregate</h4>
+          <p style="color: var(--ink-2); line-height: 1.65; font-size: 15px;">Within each dimension, factor contributions are averaged. Dimension averages are then weighted (Founder 0.25, Venture 0.30, Market 0.20, Strategic 0.25) to produce the Net Score.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 80px 1fr; gap: var(--s5);">
+        <div style="font-family: var(--serif); font-size: 48px; font-style: italic; color: var(--e-deep); font-weight: 400; line-height: 1; font-variation-settings: 'opsz' 144;">iv.</div>
+        <div>
+          <h4 style="font-family: var(--serif); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--s2);">Read the zone</h4>
+          <p style="color: var(--ink-2); line-height: 1.65; font-size: 15px;">The Net Score maps to one of five zones along the −2.0 to +2.0 spectrum: Strong Bootstrap, Bootstrap-leaning, Tension, Equity-leaning, Strong Equity.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top: var(--s7); background: var(--ink); color: var(--paper); padding: var(--s6); border-radius: 6px; border-left: 4px solid var(--accent);">
+      <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: var(--s3);">The formula</div>
+      <div style="font-family: var(--serif); font-size: 22px; font-style: italic; line-height: 1.4; font-variation-settings: 'opsz' 96;">
+        Net Score &nbsp;=&nbsp; (weighted Equity-pull) &nbsp;−&nbsp; (weighted Bootstrap-pull)
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================
+     FOUNDATIONS
+     =========================== -->
+<section class="section" id="foundations">
+  <div class="container">
+    <div class="section-meta">
+      <span class="section-num">§ 04</span>
+      <div>
+        <h2 class="section-title">The Framework stands on <em>six</em> anchors.</h2>
+        <p class="section-subtitle">Every factor in the Canvas is tagged to a specific source from the systematic literature review. The framework as a whole rests on these foundations.</p>
+      </div>
+    </div>
+
+    <div class="foundations">
+      <div class="foundation">
+        <div class="foundation-tag">Agency Theory</div>
+        <div class="foundation-cite">Jensen &amp; Meckling (1976)</div>
+        <p class="foundation-blurb">Why control and dilution matter. Equity creates principal-agent tensions between founders and external investors.</p>
+      </div>
+      <div class="foundation">
+        <div class="foundation-tag">Resource Dependence</div>
+        <div class="foundation-cite">Pfeffer &amp; Salancik (1978)</div>
+        <p class="foundation-blurb">Why founders accept dilution. External investors offer scarce resources that bootstrapping cannot provide.</p>
+      </div>
+      <div class="foundation">
+        <div class="foundation-tag">Financial Bootstrapping</div>
+        <div class="foundation-cite">Winborg &amp; Landström (2001)</div>
+        <p class="foundation-blurb">How founders self-finance: customer pre-payments, factoring, grants, deferred compensation.</p>
+      </div>
+      <div class="foundation">
+        <div class="foundation-tag">Founder Choice</div>
+        <div class="foundation-cite">Wasserman (2017)</div>
+        <p class="foundation-blurb">The throne vs. the kingdom. Risk tolerance, control, and growth ambition shape the financing path.</p>
+      </div>
+      <div class="foundation">
+        <div class="foundation-tag">VC Contracting</div>
+        <div class="foundation-cite">Kaplan &amp; Strömberg (2003)</div>
+        <p class="foundation-blurb">Empirical anchors for venture and market factors. Capital intensity and traction drive contract terms.</p>
+      </div>
+      <div class="foundation">
+        <div class="foundation-tag">Value-Add Beyond Capital</div>
+        <div class="foundation-cite">Hellmann &amp; Puri (2002)</div>
+        <p class="foundation-blurb">VCs add networks, governance, hires, and signalling — sometimes the real reason to raise.</p>
+      </div>
+    </div>
+
+    <div class="endmark">
+      The Compass replaces pattern-matching with structured reasoning. What it gives you is a directional reading. What you do with that reading is still entirely yours.
+    </div>
+  </div>
+</section>
+
+<!-- ===========================
+     COLOPHON
+     =========================== -->
+<footer class="colophon">
+  <div class="container">
+    <div class="colophon-grid">
+      <div class="brand-block">
+        <span class="brand-mark">SFDF</span>
+        <p>An open-source artifact developed as part of a master's dissertation in MIETE at FEUP/FEP, U.Porto. Released under CC BY 4.0 for content and MIT for code.</p>
+      </div>
+      <div>
+        <h5>Project</h5>
+        <ul>
+          <li><a href="#canvas">The Canvas</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#foundations">Foundations</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="https://github.com/sifat/sfdf" target="_blank" rel="noopener">GitHub repo</a></li>
+          <li><a href="SFDF_Framework_3pages.pdf" target="_blank" rel="noopener">Three-page PDF</a></li>
+          <li><a href="SFDF_Scorer_v1.xlsx" target="_blank" rel="noopener">Excel scorer</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Cite this</h5>
+        <ul>
+          <li><a href="https://github.com/sifat/sfdf/blob/main/CITATION.cff" target="_blank" rel="noopener">CITATION.cff</a></li>
+          <li><a href="https://github.com/sifat/sfdf#citation" target="_blank" rel="noopener">BibTeX</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="colophon-foot">
+      <span>SFDF v1.0 · CC BY 4.0 · MIT (code)</span>
+      <span>Sifat · MIETE Dissertation · FEUP/FEP · 2026</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ===========================
+     SCRIPT
+     =========================== -->
+<script>
+'use strict';
+
+// ============================================================
+// FRAMEWORK DATA
+// ============================================================
+const FACTORS = [
+  // dimension key, factor id, name, hint, direction (B = bootstrap, E = equity)
+  ['founder',   'A1', 'Risk tolerance',          'Low → high',                       'B'],
+  ['founder',   'A2', 'Control preference',      'Growth-first → autonomy-first',    'B'],
+  ['founder',   'A3', 'Domain experience',       'First-time → multiple exits',      'B'],
+  ['founder',   'A4', 'Personal runway',         '<3 months → 24+ months',           'B'],
+
+  ['venture',   'B1', 'Capital intensity',       'Very low → very high',             'E'],
+  ['venture',   'B2', 'Time-to-revenue',         '<3 months → 24+ months',           'E'],
+  ['venture',   'B3', 'Existing traction',       'Idea only → scaling revenue',      'B'],
+  ['venture',   'B4', 'Defensibility / IP',      'No moat → strong moat',            'E'],
+
+  ['market',    'C1', 'Market timing pressure',  'Patient → winner-takes-most',      'E'],
+  ['market',    'C2', 'Competitive density',     'Greenfield → heavily contested',   'E'],
+  ['market',    'C3', 'CAC trajectory',          'Organic → paid / high CAC',        'E'],
+
+  ['strategic', 'D1', 'Exit horizon',            'Long / no exit → 3–5 years',       'E'],
+  ['strategic', 'D2', 'Growth ambition',         'Lifestyle → hypergrowth',          'E'],
+  ['strategic', 'D3', 'VC value-add need',       'Not needed → critical',            'E'],
+  ['strategic', 'D4', 'Optionality preference',  'Commit to one path → preserve',    'B'],
+];
+
+const DIMENSIONS = {
+  founder:   { tone: 'bootstrap', label: 'Dimension A',  title: 'Founder & Team',  blurb: 'Who you are. What you absorb.',           weight: 0.25, anchor: 'Wasserman (2017)' },
+  venture:   { tone: 'venture',   label: 'Dimension B',  title: 'Venture',          blurb: 'What it costs. How fast it earns.',       weight: 0.30, anchor: 'Kaplan & Strömberg (2003)' },
+  market:    { tone: 'market',    label: 'Dimension C',  title: 'Market',           blurb: 'Where you compete. How fast.',            weight: 0.20, anchor: 'Hellmann & Puri (2002)' },
+  strategic: { tone: 'strategic', label: 'Dimension D',  title: 'Strategic',        blurb: 'What you actually want.',                 weight: 0.25, anchor: 'Wasserman (2017)' },
+};
+
+const ZONES = [
+  { id: 'strong-bootstrap',  min: -2.01, max: -1.0,  name: 'Strong Bootstrap',  tagline: 'Build profitably. Equity now would over-dilute for capital you don\'t need.' },
+  { id: 'bootstrap-leaning', min: -1.0,  max: -0.2,  name: 'Bootstrap-leaning', tagline: 'Stage your option. Bootstrap now, design for a possible later raise.' },
+  { id: 'ambiguous',         min: -0.2,  max: 0.2,   name: 'Tension / Ambiguous', tagline: 'Genuine ambiguity. Model both scenarios with an advisor before committing.' },
+  { id: 'equity-leaning',    min: 0.2,   max: 1.0,   name: 'Equity-leaning',    tagline: 'Stage the raise. Pre-seed first to a milestone, seed only after de-risking.' },
+  { id: 'strong-equity',     min: 1.0,   max: 2.01,  name: 'Strong Equity',     tagline: 'Raise with intent. Capital intensity or market timing makes bootstrapping a liability.' },
+];
+
+const ZONE_ACTIONS = {
+  'strong-bootstrap': {
+    headline: 'Build profitably.',
+    actions: [
+      'Charge customers from day one. Pre-payments, deposits, annual plans.',
+      'Apply for non-dilutive funding: national grants, EIC Accelerator, Horizon Europe.',
+      'Re-run the Framework every six months. Watch capital intensity and market timing.',
+      'Resist the temptation to raise out of FOMO when peers do.'
+    ],
+    cite: 'Anchor: Winborg & Landström (2001)',
+  },
+  'bootstrap-leaning': {
+    headline: 'Stage your option.',
+    actions: [
+      'Bootstrap now, but set explicit traction milestones that would justify a future raise.',
+      'Apply for non-dilutive grants in parallel. They extend runway without dilution.',
+      'Begin informal investor relationships now. Don\'t pitch. Build over time.',
+      'Strengthen the team where domain experience is the weakest factor.'
+    ],
+    cite: 'Anchor: Hellmann & Puri (2002)',
+  },
+  'ambiguous': {
+    headline: 'Model both paths.',
+    actions: [
+      'Build two financial scenarios — bootstrapped and seed-funded — for the next 18 months.',
+      'Identify the 2–3 factors that would tip the decision (e.g., market timing, a new entrant).',
+      'Speak with at least one founder who took each path before deciding.',
+      'Consider revenue-based financing or a small angel round as a middle path.'
+    ],
+    cite: 'Anchor: Venable et al. (2016)',
+  },
+  'equity-leaning': {
+    headline: 'Stage the raise.',
+    actions: [
+      'Pre-seed first to hit a milestone. Seed only after de-risking the round.',
+      'Identify 8–10 target investors aligned to your stage and sector.',
+      'Cap dilution per round before negotiation begins.',
+      'Speak with portfolio founders of your target investors. Assess actual value-add.'
+    ],
+    cite: 'Anchor: Kaplan & Strömberg (2003)',
+  },
+  'strong-equity': {
+    headline: 'Raise with intent.',
+    actions: [
+      'Capital intensity or market timing makes bootstrapping a structural liability.',
+      'Prioritise investor fit on value-add (network, hires, governance), not valuation.',
+      'Negotiate governance carefully: board composition, vesting, protective provisions.',
+      'Plan for the next round at fundraising time. Founders who raise must already model Series A.'
+    ],
+    cite: 'Anchor: Jensen & Meckling (1976)',
+  },
+};
+
+// ============================================================
+// STATE
+// ============================================================
+const STORAGE_KEY = 'sfdf_v1_scores';
+let scores = {}; // factor id -> 1..5
+
+// Load any saved scores
+try {
+  const saved = window.localStorage ? window.localStorage.getItem(STORAGE_KEY) : null;
+  if (saved) scores = JSON.parse(saved);
+} catch (e) {
+  scores = {};
+}
+
+// Try URL params (for share-link feature)
+const urlParams = new URLSearchParams(window.location.search);
+const sParam = urlParams.get('s');
+if (sParam && /^[0-5]{15}$/.test(sParam)) {
+  // Each character = score 1-5, '0' = unscored
+  for (let i = 0; i < FACTORS.length; i++) {
+    const ch = parseInt(sParam[i], 10);
+    if (ch >= 1 && ch <= 5) scores[FACTORS[i][1]] = ch;
+  }
+}
+
+// ============================================================
+// RENDER CANVAS
+// ============================================================
+function renderCanvas() {
+  const grid = document.getElementById('canvas-grid');
+  grid.innerHTML = '';
+
+  Object.keys(DIMENSIONS).forEach((dimKey, dimIdx) => {
+    const dim = DIMENSIONS[dimKey];
+    const factors = FACTORS.filter(f => f[0] === dimKey);
+
+    const div = document.createElement('div');
+    div.className = 'dimension fade-up fade-up-' + Math.min(dimIdx + 1, 4);
+    div.dataset.tone = dim.tone;
+    div.innerHTML = `
+      <div class="dim-label">${dim.label}</div>
+      <div class="dim-title">${dim.title}</div>
+      <div class="dim-blurb">${dim.blurb}</div>
+      <div class="dim-divider"></div>
+      <div class="factors"></div>
+      <div class="dim-footer">Weight ${dim.weight.toFixed(2)} · Anchor: ${dim.anchor}</div>
+    `;
+
+    const factorsContainer = div.querySelector('.factors');
+    factors.forEach(([_, fid, name, hint, dir]) => {
+      const dirClass = dir === 'B' ? 'bootstrap' : 'equity';
+      const dirText = dir === 'B' ? '↑ pulls Bootstrap' : '↑ pulls Equity';
+
+      const row = document.createElement('div');
+      row.className = 'factor';
+      row.innerHTML = `
+        <div class="factor-name">
+          <span class="factor-id">${fid}</span>
+          <span class="factor-label">${name}</span>
+          <span class="factor-direction ${dirClass}">${dirText} · ${hint}</span>
+        </div>
+        <div class="score-buttons" role="radiogroup" aria-label="Score ${name} from 1 to 5">
+          ${[1,2,3,4,5].map(n => `
+            <button type="button"
+                    class="score-btn ${scores[fid] === n ? 'active' : ''}"
+                    data-fid="${fid}"
+                    data-score="${n}"
+                    role="radio"
+                    aria-checked="${scores[fid] === n}"
+                    aria-label="Score ${n}">${n}</button>
+          `).join('')}
+        </div>
+      `;
+      factorsContainer.appendChild(row);
+    });
+
+    grid.appendChild(div);
+  });
+
+  // Attach click handlers
+  document.querySelectorAll('.score-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const fid = btn.dataset.fid;
+      const sc = parseInt(btn.dataset.score, 10);
+      scores[fid] = sc;
+      saveScores();
+      // Update UI for this row only
+      document.querySelectorAll(`[data-fid="${fid}"]`).forEach(b => {
+        const isActive = parseInt(b.dataset.score, 10) === sc;
+        b.classList.toggle('active', isActive);
+        b.setAttribute('aria-checked', isActive);
+      });
+      computeAndRender();
+    });
+  });
+}
+
+// ============================================================
+// COMPUTE NET SCORE
+// ============================================================
+function compute() {
+  const dimContribs = { founder: [], venture: [], market: [], strategic: [] };
+  const factorContribs = []; // for drivers/watchouts
+
+  FACTORS.forEach(([dimKey, fid, name, _, dir]) => {
+    if (!(fid in scores)) return;
+    const raw = scores[fid];
+    const centered = raw - 3;
+    // contribution: positive = pulls toward equity, negative = toward bootstrap
+    const contrib = dir === 'E' ? centered : -centered;
+    dimContribs[dimKey].push(contrib);
+    factorContribs.push({ fid, name, contrib, dimKey });
+  });
+
+  // Average within each dimension; if no scores in a dimension, treat as 0
+  const dimAvgs = {};
+  Object.keys(dimContribs).forEach(k => {
+    const arr = dimContribs[k];
+    dimAvgs[k] = arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+  });
+
+  // Weighted net score
+  const netScore = (
+    dimAvgs.founder   * DIMENSIONS.founder.weight +
+    dimAvgs.venture   * DIMENSIONS.venture.weight +
+    dimAvgs.market    * DIMENSIONS.market.weight +
+    dimAvgs.strategic * DIMENSIONS.strategic.weight
+  );
+
+  // Determine zone
+  const zone = ZONES.find(z => netScore >= z.min && netScore < z.max) || ZONES[2];
+
+  // Top drivers: factors whose contribution aligns with the net score sign
+  // Top watchouts: factors whose contribution opposes the net score sign
+  const aligned = (c) => netScore === 0 ? c : c * Math.sign(netScore);
+  const sortedAligned = [...factorContribs].sort((a, b) => aligned(b.contrib) - aligned(a.contrib));
+
+  const drivers = sortedAligned.slice(0, 3).filter(f => aligned(f.contrib) > 0);
+  const watchouts = sortedAligned.slice(-2).reverse().filter(f => aligned(f.contrib) < 0);
+
+  return { netScore, zone, drivers, watchouts, scoredCount: factorContribs.length };
+}
+
+// ============================================================
+// RENDER READING
+// ============================================================
+function computeAndRender() {
+  const { netScore, zone, drivers, watchouts, scoredCount } = compute();
+
+  // Progress
+  document.getElementById('progress').textContent = `${scoredCount} / 15 factors scored`;
+
+  const scoreEl = document.getElementById('score-num');
+  const zoneNameEl = document.getElementById('zone-name');
+  const zoneTaglineEl = document.getElementById('zone-tagline');
+  const detailEl = document.getElementById('reading-detail');
+
+  if (scoredCount === 0) {
+    scoreEl.textContent = '—';
+    scoreEl.dataset.zone = 'ambiguous';
+    zoneNameEl.textContent = 'Awaiting your scores';
+    zoneTaglineEl.textContent = 'Score every factor for a directional reading.';
+    detailEl.classList.remove('visible');
+    updateSpectrum(null);
+    return;
+  }
+
+  // Number with sign
+  const formatted = (netScore >= 0 ? '+' : '−') + Math.abs(netScore).toFixed(2);
+  scoreEl.textContent = formatted;
+  scoreEl.dataset.zone = zone.id;
+  scoreEl.classList.remove('score-pulse');
+  // trigger reflow for animation
+  void scoreEl.offsetWidth;
+  scoreEl.classList.add('score-pulse');
+
+  zoneNameEl.textContent = zone.name + '.';
+  zoneTaglineEl.textContent = zone.tagline;
+
+  updateSpectrum(zone.id);
+
+  // Show detail only when ≥ 60% scored (so ≥ 9 factors)
+  if (scoredCount >= 9) {
+    detailEl.classList.add('visible');
+    renderDriversWatchouts(drivers, watchouts, netScore);
+    renderActions(zone.id);
+  } else {
+    detailEl.classList.remove('visible');
+  }
+}
+
+function updateSpectrum(zoneId) {
+  const segs = document.querySelectorAll('#spectrum > div');
+  segs.forEach(s => s.classList.remove('active'));
+  if (!zoneId) return;
+  const map = {
+    'strong-bootstrap': 0,
+    'bootstrap-leaning': 1,
+    'ambiguous': 2,
+    'equity-leaning': 3,
+    'strong-equity': 4,
+  };
+  const idx = map[zoneId];
+  if (idx !== undefined) segs[idx].classList.add('active');
+}
+
+function renderDriversWatchouts(drivers, watchouts, netScore) {
+  const driversEl = document.getElementById('drivers-list');
+  const watchoutsEl = document.getElementById('watchouts-list');
+
+  driversEl.innerHTML = '';
+  watchoutsEl.innerHTML = '';
+
+  if (drivers.length === 0) {
+    driversEl.innerHTML = '<li style="font-style: italic; color: var(--muted); display: block;">No strongly aligned drivers yet.</li>';
+  } else {
+    drivers.forEach(d => {
+      const li = document.createElement('li');
+      const isPositive = d.contrib > 0;
+      const sign = isPositive ? '+' : '−';
+      li.innerHTML = `
+        <span class="factor-tag">${d.fid}</span>
+        <span class="factor-name-mini">${d.name}</span>
+        <span class="factor-contrib ${isPositive ? 'positive' : 'negative'}">${sign}${Math.abs(d.contrib).toFixed(1)}</span>
+      `;
+      driversEl.appendChild(li);
+    });
+  }
+
+  if (watchouts.length === 0) {
+    watchoutsEl.innerHTML = '<li style="font-style: italic; color: var(--muted); display: block;">No factors strongly opposing the recommendation.</li>';
+  } else {
+    watchouts.forEach(w => {
+      const li = document.createElement('li');
+      const isPositive = w.contrib > 0;
+      const sign = isPositive ? '+' : '−';
+      li.innerHTML = `
+        <span class="factor-tag">${w.fid}</span>
+        <span class="factor-name-mini">${w.name}</span>
+        <span class="factor-contrib ${isPositive ? 'positive' : 'negative'}">${sign}${Math.abs(w.contrib).toFixed(1)}</span>
+      `;
+      watchoutsEl.appendChild(li);
+    });
+  }
+}
+
+function renderActions(zoneId) {
+  const data = ZONE_ACTIONS[zoneId];
+  if (!data) return;
+  document.getElementById('actions-headline').textContent = data.headline;
+  const list = document.getElementById('actions-list');
+  list.innerHTML = '';
+  data.actions.forEach(a => {
+    const li = document.createElement('li');
+    li.textContent = a;
+    list.appendChild(li);
+  });
+  document.getElementById('actions-cite').textContent = data.cite;
+}
+
+// ============================================================
+// PERSISTENCE
+// ============================================================
+function saveScores() {
+  try {
+    if (window.localStorage) {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(scores));
+    }
+  } catch (e) { /* ignore — private browsing etc */ }
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+document.getElementById('btn-print').addEventListener('click', () => window.print());
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  if (!confirm('Reset all scores? This cannot be undone.')) return;
+  scores = {};
+  saveScores();
+  // Also clear share param if present
+  if (window.history && window.history.replaceState) {
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+  renderCanvas();
+  computeAndRender();
+});
+
+document.getElementById('btn-share').addEventListener('click', () => {
+  // Encode scores as 15-character string of 0-5
+  const encoded = FACTORS.map(([_, fid]) => scores[fid] || 0).join('');
+  const url = window.location.origin + window.location.pathname + '?s=' + encoded;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('btn-share');
+    const original = btn.textContent;
+    btn.textContent = '✓ Link copied';
+    setTimeout(() => { btn.textContent = original; }, 2000);
+  }).catch(() => {
+    prompt('Copy this link:', url);
+  });
+});
+
+// Mobile menu toggle
+const menuToggle = document.getElementById('menu-toggle');
+const topbarNav = document.getElementById('topbar-nav');
+if (menuToggle && topbarNav) {
+  menuToggle.addEventListener('click', () => {
+    const isOpen = topbarNav.classList.toggle('open');
+    menuToggle.setAttribute('aria-expanded', isOpen);
+  });
+  // Close menu when a nav link is tapped
+  topbarNav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      topbarNav.classList.remove('open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+}
+
+// Smooth scroll for nav links
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+// ============================================================
+// INIT
+// ============================================================
+renderCanvas();
+computeAndRender();
+
+</script>
+
+</body>
+</html>

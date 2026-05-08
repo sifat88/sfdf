@@ -1,0 +1,79 @@
+cff-version: 1.2.0
+message: "If you use this framework or its artifact in academic work, please cite it as below."
+title: "SFDF — The Strategic Financing Decision Framework"
+abstract: "A directional decision-support framework for early-stage tech founders choosing between bootstrapping and equity financing. Developed using Design Science Research methodology and grounded in Agency Theory and Resource Dependence Theory."
+type: software
+version: "1.0"
+date-released: "2026-05-06"
+authors:
+  - family-names: Sifat
+    affiliation: "Faculty of Engineering / Faculty of Economics, University of Porto (FEUP/FEP)"
+license: CC-BY-4.0
+license-url: "https://creativecommons.org/licenses/by/4.0/"
+repository-code: "https://github.com/sifat/sfdf"
+url: "https://sifat.github.io/sfdf"
+keywords:
+  - bootstrapping
+  - equity financing
+  - venture capital
+  - decision framework
+  - design science research
+  - early-stage startups
+  - founder decision-making
+  - financial strategy
+references:
+  - type: article
+    authors:
+      - family-names: Jensen
+        given-names: Michael C.
+      - family-names: Meckling
+        given-names: William H.
+    year: 1976
+    title: "Theory of the firm: Managerial behavior, agency costs and ownership structure"
+    journal: "Journal of Financial Economics"
+    volume: 3
+    issue: 4
+    start: 305
+    end: 360
+  - type: book
+    authors:
+      - family-names: Pfeffer
+        given-names: Jeffrey
+      - family-names: Salancik
+        given-names: Gerald R.
+    year: 1978
+    title: "The External Control of Organizations: A Resource Dependence Perspective"
+    publisher:
+      name: Harper & Row
+  - type: article
+    authors:
+      - family-names: Hevner
+        given-names: Alan R.
+      - family-names: March
+        given-names: Salvatore T.
+      - family-names: Park
+        given-names: Jinsoo
+      - family-names: Ram
+        given-names: Sudha
+    year: 2004
+    title: "Design science in information systems research"
+    journal: "MIS Quarterly"
+    volume: 28
+    issue: 1
+    start: 75
+    end: 105
+  - type: article
+    authors:
+      - family-names: Venable
+        given-names: John
+      - family-names: Pries-Heje
+        given-names: Jan
+      - family-names: Baskerville
+        given-names: Richard
+    year: 2016
+    title: "FEDS: A framework for evaluation in design science research"
+    journal: "European Journal of Information Systems"
+    volume: 25
+    issue: 1
+    start: 77
+    end: 89
