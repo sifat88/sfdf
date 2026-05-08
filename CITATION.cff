@@ -6,7 +6,7 @@ type: software
 version: "1.0"
 date-released: "2026-05-06"
 authors:
-  - family-names: Sifat
+  - family-names: Rakibul Islam (Sifat)
     affiliation: "Faculty of Engineering / Faculty of Economics, University of Porto (FEUP/FEP)"
 license: CC-BY-4.0
 license-url: "https://creativecommons.org/licenses/by/4.0/"

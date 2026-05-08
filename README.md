@@ -64,7 +64,7 @@ If you use this framework in academic work or in advising founders, please cite:
 
 ```bibtex
 @misc{sfdf2026,
-  author       = {Sifat},
+  author       = {Rakibul Islam (Sifat)},
   title        = {SFDF — The Strategic Financing Decision Framework},
   year         = {2026},
   institution  = {Faculty of Engineering and Faculty of Economics, University of Porto (FEUP/FEP)},

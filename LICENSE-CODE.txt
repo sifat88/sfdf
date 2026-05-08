@@ -7,7 +7,7 @@ For the framework, the artifact, and other content, see LICENSE-CONTENT.txt.
 
 ==========================================================================
 
-Copyright (c) 2026 Sifat
+Copyright (c) 2026 Rakibul Islam (Sifat)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
